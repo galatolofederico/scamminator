@@ -69,12 +69,12 @@ def reply(sender, peer_ids, tokenizer, model):
             print("Received: %s from: %s" % (received, msg["sender"]["name"]))
 
             sender.send_typing(msg.peer.cmd, 1)
-
-            new_user_input_ids = tokenizer.encode(received + tokenizer.eos_token, return_tensors="pt")
-            bot_input_ids = torch.cat([gpt_hidden_states[msg["sender"]["peer_id"]], new_user_input_ids], dim=-1) if msg["sender"]["peer_id"] in gpt_hidden_states else new_user_input_ids
-            gpt_hidden_states[msg["sender"]["peer_id"]] = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
-            reply = tokenizer.decode(gpt_hidden_states[msg["sender"]["peer_id"]][:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
-            if len(reply) == 0: reply = "sorry what?"
+            with torch.no_grad():
+                new_user_input_ids = tokenizer.encode(received + tokenizer.eos_token, return_tensors="pt")
+                bot_input_ids = torch.cat([gpt_hidden_states[msg["sender"]["peer_id"]], new_user_input_ids], dim=-1) if msg["sender"]["peer_id"] in gpt_hidden_states else new_user_input_ids
+                gpt_hidden_states[msg["sender"]["peer_id"]] = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+                reply = tokenizer.decode(gpt_hidden_states[msg["sender"]["peer_id"]][:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+                if len(reply) == 0: reply = "sorry what?"
 
             time.sleep(random.randint(0, 10))
             
