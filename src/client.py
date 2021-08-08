@@ -10,10 +10,13 @@ from pytg.utils import coroutine
 import threading
 from xmlrpc.server import SimpleXMLRPCServer
 
+from src.model import ChatModel
+
 class Client:
     def __init__(self):
         self.receiver = Receiver(host="localhost", port=4458)
         self.sender = Sender(host="localhost", port=4458)
+        self.model = ChatModel()
 
         self.cache_filename = os.path.join(os.environ["BOT_CACHE"], "active_users")
         self.active_users = dict()
@@ -24,11 +27,10 @@ class Client:
         try:
             while True:
                 msg = (yield)
-                
                 sender.status_online()
                 if "sender" not in msg:
                     continue
-                if msg["sender"]["peer_id"] not in self.active_users:
+                if str(msg["sender"]["peer_id"]) not in self.active_users:
                     continue
                 if msg.event != "message":
                     continue
@@ -43,9 +45,11 @@ class Client:
                 print("Received: %s from: %s" % (received, msg["sender"]["name"]))
 
                 sender.send_typing(msg.peer.cmd, 1)
-                
-                reply = "hellooo"
+                reply = self.model.chat(msg["sender"]["peer_id"], received)
                 sender.send_typing_abort(msg.peer.cmd)
+
+                print("Replying: %s to: %s" % (reply, msg["sender"]["name"]))
+                time.sleep(random.randint(0, 7))
                 sender.send_msg(msg.peer.cmd, reply)
 
         except GeneratorExit:
