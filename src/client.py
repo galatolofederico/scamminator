@@ -42,15 +42,16 @@ class Client:
                     continue
                 
                 received = msg.text
-                print("Received: %s from: %s" % (received, msg["sender"]["name"]))
+                logging.info("Received: %s from: %s" % (received, msg["sender"]["name"]))
 
                 sender.send_typing(msg.peer.cmd, 1)
                 reply = self.model.chat(msg["sender"]["peer_id"], received)
                 sender.send_typing_abort(msg.peer.cmd)
 
-                print("Replying: %s to: %s" % (reply, msg["sender"]["name"]))
                 time.sleep(random.randint(0, 7))
+                logging.info("Replying: %s to: %s" % (reply, msg["sender"]["name"]))
                 sender.send_msg(msg.peer.cmd, reply)
+                sender.status_offline()
 
         except GeneratorExit:
             pass
