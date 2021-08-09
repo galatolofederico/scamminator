@@ -14,8 +14,8 @@ from src.model import ChatModel
 
 class Client:
     def __init__(self):
-        self.receiver = Receiver(host="localhost", port=4458)
-        self.sender = Sender(host="localhost", port=4458)
+        self.receiver = Receiver(host=os.environ["TELEGRAM_CLI_HOST"], port=int(os.environ["TELEGRAM_CLI_PORT"]))
+        self.sender = Sender(host=os.environ["TELEGRAM_CLI_HOST"], port=int(os.environ["TELEGRAM_CLI_PORT"]))
         self.model = ChatModel()
 
         self.cache_filename = os.path.join(os.environ["BOT_CACHE"], "active_users")

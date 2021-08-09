@@ -6,6 +6,9 @@ services:
             dockerfile: ./containers/telegram-cli/Dockerfile
         volumes:
             - "./containers/telegram-cli/data:/root/.telegram-cli"
+        environment:
+            - TELEGRAM_CLI_HOST=tg
+            - TELEGRAM_CLI_PORT=4458
     bot:
         build:
             context: .
@@ -28,6 +31,8 @@ services:
         environment:
             - MODEL
             - TOKENIZER
+            - TELEGRAM_CLI_HOST=tg
+            - TELEGRAM_CLI_PORT=4458
             - BOT_CACHE=/app/cache
             - RPC_HOST=client
             - RPC_PORT=8000

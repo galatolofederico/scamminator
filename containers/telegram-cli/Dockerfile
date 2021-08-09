@@ -11,5 +11,6 @@ RUN  git clone --recursive https://github.com/vysheng/tg.git
 WORKDIR /app/tg
 RUN ./configure --disable-openssl --prefix=/usr CFLAGS="$CFLAGS -w"
 RUN make
+EXPOSE ${TELEGRAM_CLI_PORT}
 
-CMD /app/tg/bin/telegram-cli --json -P 4458
+CMD /app/tg/bin/telegram-cli --json -P ${TELEGRAM_CLI_PORT} --accept-any-tcp
