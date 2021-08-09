@@ -5,7 +5,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 class ChatModel:
-    def __init__(self, model="microsoft/DialoGPT-medium", tokenizer="microsoft/DialoGPT-medium"):
+    def __init__(self, model="microsoft/DialoGPT-large", tokenizer="microsoft/DialoGPT-large"):
         logging.info("Loading Chat Model")
         self.tokenizer = AutoTokenizer.from_pretrained(model)
         self.model = AutoModelForCausalLM.from_pretrained(tokenizer)
@@ -31,13 +31,29 @@ class ChatModel:
             else:
                 bot_input_ids = input_ids
 
-            hidden_state =  self.model.generate(bot_input_ids, max_length=1000, pad_token_id=self.tokenizer.eos_token_id)
+            self.hidden_states[conversation] = self.model.generate(
+                bot_input_ids,
+                min_length = 1,
+                max_length=1000,
+                do_sample = True,
+                early_stopping = False,
+                num_beams = 1,
+                num_beam_groups = 1,
+                diversity_penalty = 0.0,
+                temperature = 1,
+                top_k = 40,
+                top_p = 0.9,
+                repetition_penalty = 1,
+                length_penalty = 1,
+                no_repeat_ngram_size = 0,
+                num_return_sequences = 1,
+                pad_token_id=self.tokenizer.eos_token_id
+            )
     
             cache_file = open(cache_filename, "wb")
-            pickle.dump(hidden_state, cache_file)
+            pickle.dump(self.hidden_states[conversation], cache_file)
             cache_file.close()
-
-            reply = self.tokenizer.decode(hidden_state[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
+            reply = self.tokenizer.decode(self.hidden_states[conversation][:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
             if len(reply) == 0: reply = "sorry what?"
 
             return reply
@@ -47,9 +63,6 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     model = ChatModel()
 
-    print(model.chat(1, "hi my name is federico"))
-    print(model.chat(2, "hi my name is marco"))
-
-    print(model.chat(1, "what is my name?"))
-    print(model.chat(2, "what is my name?"))
+    while True:
+        print("Bot>> ", model.chat(2, input("Human>> ")))
     
