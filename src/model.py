@@ -5,10 +5,10 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 class ChatModel:
-    def __init__(self, model="microsoft/DialoGPT-large", tokenizer="microsoft/DialoGPT-large"):
+    def __init__(self):
         logging.info("Loading Chat Model")
-        self.tokenizer = AutoTokenizer.from_pretrained(model)
-        self.model = AutoModelForCausalLM.from_pretrained(tokenizer)
+        self.tokenizer = AutoTokenizer.from_pretrained(os.environ["MODEL"])
+        self.model = AutoModelForCausalLM.from_pretrained(os.environ["TOKENIZER"])
         logging.info("Model loaded")
         
         self.cache = os.environ["BOT_CACHE"]
