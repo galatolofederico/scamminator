@@ -1,0 +1,33 @@
+version: "3.3"
+services:
+    tg:
+        build:
+            context: .
+            dockerfile: ./containers/telegram-cli/Dockerfile
+        volumes:
+            - "./containers/telegram-cli/data:/root/.telegram-cli"
+    bot:
+        build:
+            context: .
+            dockerfile: ./containers/bot/Dockerfile
+        volumes:
+            - "./containers/bot/data:/app/cache"
+        environment:
+            - BOT_TOKEN
+            - BOT_PASSWORD
+            - BOT_CACHE=/app/cache
+            - RPC_HOST=client
+            - RPC_PORT=8000
+    client:
+        build:
+            context: .
+            dockerfile: ./containers/client/Dockerfile
+        volumes:
+            - "./containers/client/data/cache:/app/cache"
+            - "./containers/client/data/models:/root/.cache/huggingface/"
+        environment:
+            - MODEL
+            - TOKENIZER
+            - BOT_CACHE=/app/cache
+            - RPC_HOST=client
+            - RPC_PORT=8000
