@@ -58,7 +58,7 @@ After logging in you can quit the client with `CTRL+D`. You are now ready to fig
 
 ## Usage
 
-Run ``scamminator``
+Run ``scamminator``. The first run will require some time to download the `DialoGPT` model.
 
 ```
 docker-compose up
