@@ -41,6 +41,7 @@ def help_command(update, context):
 /search <name> Search <name> in your chats list
 /add <id> <name>  Adds <id> with the name <name> to the list of scamminator users
 /remove <id>  Removes <id> from the list of scamminator users
+/reset <id> Resets the AI for <id>
 """)
 
 def search_command(update, context):
@@ -85,6 +86,16 @@ def list_command(update, context):
     else:
         update.message.reply_text("Scamminator is not active /add a user to activate it")
 
+def reset_command(update, context):
+    if not check_admin(update): return
+    if len(context.args) != 1:
+        update.message.reply_text("Error: use /reset <id>")
+        return
+    if client.reset(context.args[0]):
+        update.message.reply_text("Conversation id '%s' reset" % (context.args[0]))
+    else:
+        update.message.reply_text("Cant reset '%s'" % (context.args[0]))
+
 def password_command(update, context):
     if len(context.args) != 1:
         update.message.reply_text("Error: use /password <your_password>")
@@ -110,6 +121,7 @@ def start():
     dispatcher.add_handler(CommandHandler("search", search_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("add", add_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("remove", remove_command, pass_args=True))
+    dispatcher.add_handler(CommandHandler("reset", reset_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("list", list_command))
     
 

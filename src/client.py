@@ -88,14 +88,20 @@ class Client:
         self.save_cache()
         return True
     
-    def remove(self, name):
-        if name not in self.active_users:
+    def remove(self, peer_id):
+        if peer_id not in self.active_users:
             return False
         else:
-            del self.active_users[name]
+            del self.active_users[peer_id]
             self.save_cache()
             return True
-
+    
+    def reset(self, peer_id):
+        if peer_id not in self.active_users:
+            return False
+        else:
+            return self.model.reset(peer_id)
+    
     def list(self):
         return self.active_users
 
@@ -115,7 +121,10 @@ class RPCWrapper:
     
     def remove(self, peer_id):
         return self.client.remove(peer_id)
-    
+
+    def reset(self, peer_id):
+        return self.client.reset(peer_id)
+
     def list(self):
         return self.client.list()
 

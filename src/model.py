@@ -14,6 +14,17 @@ class ChatModel:
         self.cache = os.environ["BOT_CACHE"]
         self.hidden_states = dict()
 
+    def reset(self, conversation):
+        conversation = str(conversation)
+        cache_filename = os.path.join(self.cache, conversation)
+        if conversation in self.hidden_states:
+            del self.hidden_states[conversation]
+            logging.info("Deleted hidden state for '%s'" % (conversation, ))
+        if os.path.exists(cache_filename):
+            os.remove(cache_filename)
+            logging.info("Deleted cache file for '%s'" % (conversation, ))
+        return True
+    
     def chat(self, conversation, message):
         conversation = str(conversation)
         cache_filename = os.path.join(self.cache, conversation)
