@@ -1,6 +1,7 @@
 version: "3.3"
 services:
     tg:
+        restart: unless-stopped
         build:
             context: .
             dockerfile: ./containers/telegram-cli/Dockerfile
@@ -10,6 +11,7 @@ services:
             - TELEGRAM_CLI_HOST=tg
             - TELEGRAM_CLI_PORT=4458
     bot:
+        restart: unless-stopped
         build:
             context: .
             dockerfile: ./containers/bot/Dockerfile
@@ -22,6 +24,7 @@ services:
             - RPC_HOST=client
             - RPC_PORT=8000
     client:
+        restart: unless-stopped
         build:
             context: .
             dockerfile: ./containers/client/Dockerfile
