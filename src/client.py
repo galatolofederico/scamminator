@@ -87,7 +87,39 @@ class Client:
         self.active_users[peer_id] = name
         self.save_cache()
         return True
-    
+
+    def force_reply(self, peer_id):
+        try:
+            peer_id = int(peer_id)
+        except:
+            return False
+        peer = None
+        for user in self.dialog_list():
+            if peer_id == user["peer_id"]:
+                peer = user["print_name"]
+                break
+        if peer is None: return False
+
+        last_msg = None
+        for event in self.sender.history(peer):
+            if event["event"] == "message" and not event["out"] and "text" in event:
+                last_msg = event["text"]
+        
+        if last_msg is None:
+            return False
+        
+        logging.info("Force Reply using: %s from: %s" % (last_msg, peer))
+
+        self.sender.send_typing(peer, 1)
+        reply = self.model.chat(peer, last_msg)
+        self.sender.send_typing_abort(peer)
+
+        logging.info("Replying: %s to : %s" % (reply, peer))
+        self.sender.send_msg(peer, reply)
+        self.sender.status_offline()
+
+        return True
+
     def remove(self, peer_id):
         if peer_id not in self.active_users:
             return False
@@ -101,7 +133,7 @@ class Client:
             return False
         else:
             return self.model.reset(peer_id)
-    
+
     def list(self):
         return self.active_users
 
@@ -119,6 +151,9 @@ class RPCWrapper:
     def add(self, peer_id, name):
         return self.client.add(peer_id, name)
     
+    def reply(self, peer_id):
+        return self.client.force_reply(peer_id)
+
     def remove(self, peer_id):
         return self.client.remove(peer_id)
 
