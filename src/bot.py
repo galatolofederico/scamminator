@@ -56,7 +56,20 @@ def search_command(update, context):
         update.message.reply_text(reply)
     else:
         update.message.reply_text("No results for '%s'" % ("".join(context.args)))
-    
+
+def activate_command(update, context):
+    if not check_admin(update): return
+    if len(context.args) != 2:
+        update.message.reply_text("Error: use /activate <id> <name> (name is just a mnemonic name)")
+        return
+    if client.add(context.args[0], context.args[1]):
+        if client.reply(context.args[0]):
+            update.message.reply_text("Rely sent to id '%s' and added to auto-reply list" % (context.args[0]))
+        else:
+            update.message.reply_text("cant reply to id '%s'" % (context.args[0]))
+    else:
+        update.message.reply_text("cant add '%s'" % (context.args[0]))
+
 def add_command(update, context):
     if not check_admin(update): return
     if len(context.args) != 2:
@@ -71,7 +84,6 @@ def reply_command(update, context):
     if not check_admin(update): return
     if len(context.args) != 1:
         update.message.reply_text("Error: use /reply <id>")
-        return
     if client.reply(context.args[0]):
         update.message.reply_text("Reply sent to id '%s'" % (context.args[0]))
     else:
@@ -131,6 +143,7 @@ def start():
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("password", password_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("search", search_command, pass_args=True))
+    dispatcher.add_handler(CommandHandler("activate", activate_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("add", add_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("reply", reply_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("remove", remove_command, pass_args=True))
