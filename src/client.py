@@ -84,9 +84,11 @@ class Client:
         return self.sender.dialog_list()
     
     def add(self, peer_id, name):
-        self.active_users[peer_id] = name
-        self.save_cache()
-        return True
+        if peer_id not in self.active_users:
+            self.active_users[peer_id] = name
+            self.save_cache()
+            return True
+        return False
 
     def force_reply(self, peer_id):
         try:
