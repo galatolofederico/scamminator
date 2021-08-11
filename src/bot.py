@@ -37,10 +37,12 @@ def start_command(update, context):
 def help_command(update, context):
     if not check_admin(update): return
     update.message.reply_text("""
-/list  Shows the list of scamminator users
+/list  Shows the auto-reply list
 /search <name> Search <name> in your chats list
-/add <id> <name>  Adds <id> with the name <name> to the list of scamminator users
-/remove <id>  Removes <id> from the list of scamminator users
+/activate <id> <name> Combination of /add <id> <name> and /reply <id>
+/add <id> <name>  Adds <id> with the name <name> to the auto-reply list
+/reply <id> Force reply to last received message
+/remove <id>  Removes <id> from the auto-reply list
 /reset <id> Resets the AI for <id>
 """)
 
@@ -64,6 +66,16 @@ def add_command(update, context):
         update.message.reply_text("id '%s' added to scamminator" % (context.args[0]))
     else:
         update.message.reply_text("cant add '%s'" % (context.args[0]))
+
+def reply_command(update, context):
+    if not check_admin(update): return
+    if len(context.args) != 1:
+        update.message.reply_text("Error: use /reply <id>")
+        return
+    if client.reply(context.args[0]):
+        update.message.reply_text("Reply sent to id '%s'" % (context.args[0]))
+    else:
+        update.message.reply_text("cant reply to id '%s'" % (context.args[0]))
 
 def remove_command(update, context):
     if not check_admin(update): return
@@ -120,6 +132,7 @@ def start():
     dispatcher.add_handler(CommandHandler("password", password_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("search", search_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("add", add_command, pass_args=True))
+    dispatcher.add_handler(CommandHandler("reply", reply_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("remove", remove_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("reset", reset_command, pass_args=True))
     dispatcher.add_handler(CommandHandler("list", list_command))
