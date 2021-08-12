@@ -95,6 +95,7 @@ class Client:
             peer_id = int(peer_id)
         except:
             return False
+        
         peer = None
         for user in self.dialog_list():
             if peer_id == user["peer_id"]:
@@ -103,12 +104,12 @@ class Client:
         if peer is None: return False
 
         last_msg = None
-        for event in self.sender.history(peer):
-            if event["event"] == "message" and not event["out"] and "text" in event:
-                last_msg = event["text"]
-        
-        if last_msg is None:
-            return False
+        try:
+            for event in self.sender.history(peer):
+                if event["event"] == "message" and not event["out"] and "text" in event:
+                    last_msg = event["text"]
+        except:
+            last_msg = "Hi"
         
         logging.info("Force Reply using: %s from: %s" % (last_msg, peer))
 
